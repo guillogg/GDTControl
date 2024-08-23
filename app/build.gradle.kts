@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation ("androidx.navigation:navigation-compose:2.5.2")
     implementation ("androidx.camera:camera-view:1.0.0-alpha31")
     implementation("androidx.camera:camera-lifecycle:1.0.2")
     implementation ("androidx.camera:camera-camera2:1.0.2")

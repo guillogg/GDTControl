@@ -15,10 +15,10 @@ fun navigation (navController: NavHostController){
             MenuScreen(navController)
         }
         composable(route = Appscreens.ScannerScreen.route){
-            ScannerScreen(navController)
+            ScannerScreen()
         }
         composable(route = Appscreens.ProductGeneratorScreen.route){
-            ProductGeneratorScreen(navController)
+            ProductGeneratorScreen()
         }
 
     }

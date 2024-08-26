@@ -62,9 +62,5 @@ class ViewModel(private val productRepository: ProductRepository) : ViewModel() 
     suspend fun getLastProductId(): Int? {
         return productRepository.getLastProductId()
     }
-    fun getProduct() {
-        viewModelScope.launch {
-            productRepository.getProduct(1)
-        }
-    }
+
 }

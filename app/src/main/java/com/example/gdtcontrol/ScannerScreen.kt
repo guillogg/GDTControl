@@ -34,7 +34,7 @@ import androidx.core.content.ContextCompat
 
 
 @Composable
-fun ScannerScreen(){
+fun ScannerScreen(viewModel: ViewModel) {
 
 
     var code by remember { mutableStateOf("") }

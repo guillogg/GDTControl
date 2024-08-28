@@ -3,6 +3,7 @@ package com.example.gdtcontrol
 import android.graphics.ImageFormat
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import androidx.compose.runtime.Composable
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.BinaryBitmap
 import com.google.zxing.DecodeHintType
@@ -11,7 +12,7 @@ import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import java.nio.ByteBuffer
 
-class QrCodeAnalyzer(private val onQrcodeScanned: (String) -> Unit) : ImageAnalysis.Analyzer {
+class QrCodeAnalyzer(private val onQrcodeScanned:  (String) -> Unit) : ImageAnalysis.Analyzer {
     private val supportedImageFormat =
         listOf(ImageFormat.YUV_420_888, ImageFormat.YUV_422_888, ImageFormat.YUV_444_888)
 

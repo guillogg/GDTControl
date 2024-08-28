@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,15 +28,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavHostController
+import com.example.gdtcontrol.navigation.Appscreens
 
 
 @Composable
-fun ScannerScreen(viewModel: ViewModel) {
-
+fun ScannerScreen(viewModel: ViewModel, navController: NavHostController) {
 
     var code by remember { mutableStateOf("") }
     val context = LocalContext.current
@@ -55,55 +58,84 @@ fun ScannerScreen(viewModel: ViewModel) {
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { granted ->
             hasCamPermission = granted
-        })
+        }
+    )
     LaunchedEffect(key1 = true) {
         launcher.launch(Manifest.permission.CAMERA)
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center)
-    {
-        Column {
-
+            // Vista de la cámara ocupa la mitad superior
             if (hasCamPermission) {
-                AndroidView(factory = { context ->
-                    val previewView = PreviewView(context)
-                    val preview = Preview.Builder().build()
-                    val selector =
-                        CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                AndroidView(
+                    factory = { context ->
+                        val previewView = PreviewView(context)
+                        val preview = Preview.Builder().build()
+                        val selector = CameraSelector.Builder()
+                            .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                             .build()
-                    preview.setSurfaceProvider(previewView.surfaceProvider)
-                    val imageAnalysis = ImageAnalysis.Builder()
-                        .setTargetResolution(Size(previewView.width, previewView.height))
-                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build()
-                    imageAnalysis.setAnalyzer(
-                        ContextCompat.getMainExecutor(context),
-                        QrCodeAnalyzer { result ->
-                            code = result
-                        }
-
-                    )
-                    try {
-                        cameraProviderFuture.get().bindToLifecycle(
-                            lifecycleOwner, selector, preview, imageAnalysis
+                        preview.setSurfaceProvider(previewView.surfaceProvider)
+                        val imageAnalysis = ImageAnalysis.Builder()
+                            .setTargetResolution(Size(previewView.width, previewView.height))
+                            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                            .build()
+                        imageAnalysis.setAnalyzer(
+                            ContextCompat.getMainExecutor(context),
+                            QrCodeAnalyzer { result ->
+                                code = result
+                            }
                         )
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                    previewView
-                },modifier = Modifier.weight(1f))
-
-
-                Text(
-                    code,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
+                        try {
+                            cameraProviderFuture.get().bindToLifecycle(
+                                lifecycleOwner, selector, preview, imageAnalysis
+                            )
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                        previewView
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(32.dp)
+                        .weight(1f) // Ocupa la mitad superior
                 )
             }
+
+            // Vista de texto y botón ocupa la mitad inferior
+            Column(
+                modifier = Modifier
+                    .weight(1f) // Ocupa la mitad inferior
+                    .padding(16.dp)
+            ) {
+                if (code.isNotEmpty()) {
+                    Button(
+                        onClick = { navController.navigate(Appscreens.ProductDetailScreen.route + "/$code") },
+                        modifier = Modifier.align(Alignment.CenterHorizontally) // Botón centrado horizontalmente
+                    ) {
+                        Text("Ver Detalle")
+                    }
+                } else {
+                    Text(
+                        text = "Esperando QR...",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp), // Espacio entre el texto y el botón
+                        textAlign = TextAlign.Center
+                    )
+
+                }
+
+            }
+
 
         }
     }
 }
+
+
+
+
+

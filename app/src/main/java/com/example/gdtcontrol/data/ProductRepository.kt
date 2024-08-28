@@ -1,25 +1,28 @@
 package com.example.gdtcontrol.data
 
 import com.example.gdtcontrol.Product
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class ProductRepository(private val productDao: ProductDao) {
 
     //ver mas adelante agregar la funcion para obtener todos los productos
-    suspend fun getProduct(id: Int): Product {
-        val entity = productDao.selectProduct(id)
+    fun getProductById(id: Int): Product {
+        val product = productDao.selectProduct(id)
         return Product(
-            entity.name,
-            entity.description,
-            entity.stock,
-            entity.stockMax,
-            entity.stockMin,
-            entity.proveedor,
-            entity.emailProveedor
+            product!!.name,
+            product.description,
+            product.stock,
+            product.stockMax,
+            product.stockMin,
+            product.proveedor,
+            product.emailProveedor
         )
 
     }
 
-    suspend fun addProduct(product: Product)  {
+
+    suspend fun addProduct(product: Product) {
         val entity = ProductEntity(
             name = product.name,
             description = product.description,
@@ -29,14 +32,13 @@ class ProductRepository(private val productDao: ProductDao) {
             proveedor = product.proveedor,
             emailProveedor = product.emailProveedor
         )
-       productDao.addProduct(entity)
+        productDao.addProduct(entity)
 
     }
 
     suspend fun getLastProductId(): Int? {
         return productDao.getLastProduct()?.id
     }
-
 
 
 }

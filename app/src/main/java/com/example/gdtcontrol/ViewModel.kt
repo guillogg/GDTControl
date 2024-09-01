@@ -1,15 +1,14 @@
 package com.example.gdtcontrol
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gdtcontrol.data.ProductRepository
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ViewModel(private val productRepository: ProductRepository) : ViewModel() {
@@ -17,16 +16,18 @@ class ViewModel(private val productRepository: ProductRepository) : ViewModel() 
         private set
 
     var isFormVisible by mutableStateOf(true)
+    private val _product = MutableStateFlow<Product?>(null)
+    val product: StateFlow<Product?> = _product.asStateFlow()
 
-    val product = MutableLiveData<Product>()
 
-    fun getProductById(productId: String): Product {
-
-        val currentproduct = productRepository.getProductById(productId.toInt())
-
-        return currentproduct
-
+    fun getProductById(productId: String) {
+        viewModelScope.launch {
+            val currentProduct = productRepository.getProductById(productId.toInt())
+            _product.value = currentProduct
+        }
     }
+
+
 
     fun onNameChange(name: String) {
         state = state.copy(name = name)
@@ -40,14 +41,14 @@ class ViewModel(private val productRepository: ProductRepository) : ViewModel() 
         state = state.copy(stock = stock)
     }
 
-    fun onStockMinChange(stockMin: Int) {
-        state = state.copy(stockMin = stockMin)
-        validateStockValues()
-    }
 
     fun onStockMaxChange(stockMax: Int) {
         state = state.copy(stockMax = stockMax)
-        validateStockValues()
+        //validateStockValues()
+    }
+    fun onStockMinChange(stockMin: Int) {
+        state = state.copy(stockMin = stockMin)
+       // validateStockValues()
     }
 
     fun onProveedorChange(proveedor: String) {
@@ -57,19 +58,49 @@ class ViewModel(private val productRepository: ProductRepository) : ViewModel() 
     fun onEmailProveedorChange(emailProveedor: String) {
         state = state.copy(emailProveedor = emailProveedor)
     }
+
     private fun validateStockValues() {
         if (state.stockMin > state.stockMax) {
             state = state.copy(stockMin = state.stockMax)
         }
     }
+
+    fun updateProductName(name: String) {
+        _product.value = _product.value?.copy(name = name)
+    }
+
+    fun updateProductDescription(description: String) {
+        _product.value = _product.value?.copy(description = description)
+    }
+
+    fun updateProductStock(stock: Int) {
+        _product.value = _product.value?.copy(stock = stock)
+    }
+
+    fun updateProductStockMax(stockMax: Int) {
+        _product.value = _product.value?.copy(stockMax = stockMax)
+    }
+
+    fun updateProductStockMin(stockMin: Int) {
+        _product.value = _product.value?.copy(stockMin = stockMin)
+    }
+
+    fun updateProductProveedor(proveedor: String) {
+        _product.value = _product.value?.copy(proveedor = proveedor)
+    }
+
+    fun updateProductEmailProveedor(emailProveedor: String) {
+        _product.value = _product.value?.copy(emailProveedor = emailProveedor)
+    }
+
     fun addProduct() {
 
         val product = Product(
             state.name,
             state.description,
             state.stock,
-            state.stockMin,
             state.stockMax,
+            state.stockMin,
             state.proveedor,
             state.emailProveedor
         )
@@ -85,15 +116,41 @@ class ViewModel(private val productRepository: ProductRepository) : ViewModel() 
         state = ProductGeneratorState()
     }
 
-    fun hideForm() {
-        isFormVisible = false
-        isFormVisible = true
+    fun changeVisibility() {
+        isFormVisible = !isFormVisible
     }
-//lo nuevo
 
-    //hasta aca
     suspend fun getLastProductId(): Int? {
         return productRepository.getLastProductId()
+    }
+
+    fun updateProduct(code: String) {
+        val currentproduct = Product(
+            product.value!!.name,
+            product.value!!.description,
+            product.value!!.stock,
+            product.value!!.stockMax,
+            product.value!!.stockMin,
+            product.value!!.proveedor,
+            product.value!!.emailProveedor
+        )
+        viewModelScope.launch {
+            productRepository.updateProduct(currentproduct,code)
+        }
+    }
+    fun deleteProduct(code: String) {
+        val currentproduct = Product(
+            product.value!!.name,
+            product.value!!.description,
+            product.value!!.stock,
+            product.value!!.stockMin,
+            product.value!!.stockMax,
+            product.value!!.proveedor,
+            product.value!!.emailProveedor
+        )
+        viewModelScope.launch {
+            productRepository.deleteProduct(currentproduct,code)
+        }
     }
 
 }

@@ -10,8 +10,11 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
@@ -39,7 +43,6 @@ import com.example.gdtcontrol.navigation.Appscreens
 
 @Composable
 fun ScannerScreen(viewModel: ViewModel, navController: NavHostController) {
-
     var code by remember { mutableStateOf("") }
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -64,76 +67,77 @@ fun ScannerScreen(viewModel: ViewModel, navController: NavHostController) {
         launcher.launch(Manifest.permission.CAMERA)
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize()) {
 
-            // Vista de la cámara ocupa la mitad superior
-            if (hasCamPermission) {
-                AndroidView(
-                    factory = { context ->
-                        val previewView = PreviewView(context)
-                        val preview = Preview.Builder().build()
-                        val selector = CameraSelector.Builder()
-                            .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                            .build()
-                        preview.setSurfaceProvider(previewView.surfaceProvider)
-                        val imageAnalysis = ImageAnalysis.Builder()
-                            .setTargetResolution(Size(previewView.width, previewView.height))
-                            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                            .build()
-                        imageAnalysis.setAnalyzer(
-                            ContextCompat.getMainExecutor(context),
-                            QrCodeAnalyzer { result ->
-                                code = result
-                            }
-                        )
-                        try {
-                            cameraProviderFuture.get().bindToLifecycle(
-                                lifecycleOwner, selector, preview, imageAnalysis
-                            )
-                        } catch (e: Exception) {
-                            e.printStackTrace()
+        if (hasCamPermission) {
+            AndroidView(
+                factory = { context ->
+                    val previewView = PreviewView(context)
+                    val preview = Preview.Builder().build()
+                    val selector = CameraSelector.Builder()
+                        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                        .build()
+                    preview.setSurfaceProvider(previewView.surfaceProvider)
+                    val imageAnalysis = ImageAnalysis.Builder()
+                        .setTargetResolution(Size(previewView.width, previewView.height))
+                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .build()
+                    imageAnalysis.setAnalyzer(
+                        ContextCompat.getMainExecutor(context),
+                        QrCodeAnalyzer { result ->
+                            code = result
                         }
-                        previewView
-                    },
+                    )
+                    try {
+                        cameraProviderFuture.get().bindToLifecycle(
+                            lifecycleOwner, selector, preview, imageAnalysis
+                        )
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                    previewView
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(16.dp)
+                .background(Color.White)
+                .align(Alignment.CenterHorizontally),
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (code.isNotEmpty()) {
+                Button(
+                    onClick = { navController.navigate(Appscreens.ProductDetailScreen.route + "/$code") },
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    Text("Ver Detalle")
+                }
+            } else {
+                Text(
+                    text = "Esperando QR...",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f) // Ocupa la mitad superior
+                        .padding(bottom = 16.dp),
+                    textAlign = TextAlign.Center
                 )
             }
-
-            // Vista de texto y botón ocupa la mitad inferior
-            Column(
-                modifier = Modifier
-                    .weight(1f) // Ocupa la mitad inferior
-                    .padding(16.dp)
-            ) {
-                if (code.isNotEmpty()) {
-                    Button(
-                        onClick = { navController.navigate(Appscreens.ProductDetailScreen.route + "/$code") },
-                        modifier = Modifier.align(Alignment.CenterHorizontally) // Botón centrado horizontalmente
-                    ) {
-                        Text("Ver Detalle")
-                    }
-                } else {
-                    Text(
-                        text = "Esperando QR...",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp), // Espacio entre el texto y el botón
-                        textAlign = TextAlign.Center
-                    )
-
-                }
-
-            }
-
-
         }
     }
 }
+
+
+
 
 
 

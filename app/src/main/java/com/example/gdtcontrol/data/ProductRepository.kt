@@ -7,18 +7,19 @@ import kotlinx.coroutines.flow.map
 class ProductRepository(private val productDao: ProductDao) {
 
     //ver mas adelante agregar la funcion para obtener todos los productos
-    fun getProductById(id: Int): Product {
+    fun getProductById(id: Int): Product? {
         val product = productDao.selectProduct(id)
-        return Product(
-            product!!.name,
-            product.description,
-            product.stock,
-            product.stockMax,
-            product.stockMin,
-            product.proveedor,
-            product.emailProveedor
-        )
-
+        return product?.let {
+            Product(
+                it.name,
+                it.description,
+                it.stock,
+                it.stockMax,
+                it.stockMin,
+                it.proveedor,
+                it.emailProveedor
+            )
+        }
     }
 
 
@@ -40,5 +41,33 @@ class ProductRepository(private val productDao: ProductDao) {
         return productDao.getLastProduct()?.id
     }
 
+    suspend fun updateProduct(product: Product, code: String) {
+        val entity = ProductEntity(
+            id = code.toInt(),
+            name = product.name,
+            description = product.description,
+            stock = product.stock,
+            stockMax = product.stockMax,
+            stockMin = product.stockMin,
+            proveedor = product.proveedor,
+            emailProveedor = product.emailProveedor
+        )
+        productDao.updateProduct(entity)
+    }
+
+    suspend fun deleteProduct(product: Product, code: String) {
+        val entity = ProductEntity(
+            id = code.toInt(),
+            name = product.name,
+            description = product.description,
+            stock = product.stock,
+            stockMax = product.stockMax,
+            stockMin = product.stockMin,
+            proveedor = product.proveedor,
+            emailProveedor = product.emailProveedor
+        )
+
+        productDao.deleteProduct(entity)
+    }
 
 }

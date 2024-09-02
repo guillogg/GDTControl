@@ -1,11 +1,13 @@
 package com.example.gdtcontrol
 
+import MailSender
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gdtcontrol.data.ProductRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +20,7 @@ class ViewModel(private val productRepository: ProductRepository) : ViewModel() 
     var isFormVisible by mutableStateOf(true)
     private val _product = MutableStateFlow<Product?>(null)
     val product: StateFlow<Product?> = _product.asStateFlow()
-
+    private val mailSender = MailSender("gdtcontrol9@gmail.com", "xpfo xpgf snmk ngll")
 
     fun getProductById(productId: String) {
         viewModelScope.launch {
@@ -26,7 +28,6 @@ class ViewModel(private val productRepository: ProductRepository) : ViewModel() 
             _product.value = currentProduct
         }
     }
-
 
 
     fun onNameChange(name: String) {
@@ -46,9 +47,10 @@ class ViewModel(private val productRepository: ProductRepository) : ViewModel() 
         state = state.copy(stockMax = stockMax)
         //validateStockValues()
     }
+
     fun onStockMinChange(stockMin: Int) {
         state = state.copy(stockMin = stockMin)
-       // validateStockValues()
+        // validateStockValues()
     }
 
     fun onProveedorChange(proveedor: String) {
@@ -135,9 +137,10 @@ class ViewModel(private val productRepository: ProductRepository) : ViewModel() 
             product.value!!.emailProveedor
         )
         viewModelScope.launch {
-            productRepository.updateProduct(currentproduct,code)
+            productRepository.updateProduct(currentproduct, code)
         }
     }
+
     fun deleteProduct(code: String) {
         val currentproduct = Product(
             product.value!!.name,
@@ -149,8 +152,30 @@ class ViewModel(private val productRepository: ProductRepository) : ViewModel() 
             product.value!!.emailProveedor
         )
         viewModelScope.launch {
-            productRepository.deleteProduct(currentproduct,code)
+            productRepository.deleteProduct(currentproduct, code)
         }
     }
 
+    fun checkStockAndSendEmail(code: String) {
+        getProductById(code)
+        if (product.value!!.stock <= product.value!!.stockMin) {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    mailSender.sendEmail(
+                        "guillermo_gaona@hotmail.com",
+                        "Stock Bajo del producto ${product.value?.name}",
+                        "El stock del producto ${product.value?.name} es bajo, necesitamos que nos envies ${product.value!!.stockMax - product.value!!.stockMin} mas"
+                    )
+
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+            }
+        }
+    }
+
+
 }
+

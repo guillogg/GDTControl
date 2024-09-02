@@ -46,9 +46,14 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/NOTICE.md"
+            excludes += "META-INF/LICENSE.md"
         }
     }
+
 }
+
+
 
 dependencies {
 
@@ -68,6 +73,9 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     implementation(libs.androidx.runtime.livedata)
+
+    implementation ("com.sun.mail:android-mail:1.6.7")
+    implementation ("com.sun.mail:android-activation:1.6.7")
     kapt("androidx.room:room-compiler:2.6.1")
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")

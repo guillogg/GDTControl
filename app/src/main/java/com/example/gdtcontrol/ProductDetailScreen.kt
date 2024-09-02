@@ -127,6 +127,8 @@ fun ProductDetailScreen(
                             Toast.LENGTH_SHORT
                         ).show()
                         navController.navigate(Appscreens.MenuScreen.route)
+
+                        viewModel.checkStockAndSendEmail(code)
                     }) {
                         Text(text = "Guardar")
                     }

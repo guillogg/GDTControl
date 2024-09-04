@@ -1,12 +1,15 @@
 package com.example.gdtcontrol.data
 
 import com.example.gdtcontrol.Product
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import com.example.gdtcontrol.ProductService
 
-class ProductRepository(private val productDao: ProductDao) {
 
-    //ver mas adelante agregar la funcion para obtener todos los productos
+class ProductRepository(
+    private val productDao: ProductDao,
+    private val productService: ProductService
+    ) {
+
+
     fun getProductById(id: Int): Product? {
         val product = productDao.selectProduct(id)
         return product?.let {
@@ -33,7 +36,14 @@ class ProductRepository(private val productDao: ProductDao) {
             proveedor = product.proveedor,
             emailProveedor = product.emailProveedor
         )
-        productDao.addProduct(entity)
+        productService.createProduct(entity)
+        try {
+            productDao.addProduct(entity)
+        }catch (e: Exception){
+            //
+        }
+
+
 
     }
 
@@ -53,6 +63,8 @@ class ProductRepository(private val productDao: ProductDao) {
             emailProveedor = product.emailProveedor
         )
         productDao.updateProduct(entity)
+
+
     }
 
     suspend fun deleteProduct(product: Product, code: String) {
@@ -68,6 +80,9 @@ class ProductRepository(private val productDao: ProductDao) {
         )
 
         productDao.deleteProduct(entity)
+
     }
+
+
 
 }

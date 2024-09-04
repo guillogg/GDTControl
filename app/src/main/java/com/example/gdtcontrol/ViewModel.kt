@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ViewModel(private val productRepository: ProductRepository) : ViewModel() {
+class ViewModel(private val productRepository: ProductRepository,private val productService: ProductService) : ViewModel() {
     var state by mutableStateOf(ProductGeneratorState())
         private set
 
@@ -61,11 +61,7 @@ class ViewModel(private val productRepository: ProductRepository) : ViewModel() 
         state = state.copy(emailProveedor = emailProveedor)
     }
 
-    private fun validateStockValues() {
-        if (state.stockMin > state.stockMax) {
-            state = state.copy(stockMin = state.stockMax)
-        }
-    }
+
 
     fun updateProductName(name: String) {
         _product.value = _product.value?.copy(name = name)
@@ -175,6 +171,9 @@ class ViewModel(private val productRepository: ProductRepository) : ViewModel() 
             }
         }
     }
+
+
+
 
 
 }

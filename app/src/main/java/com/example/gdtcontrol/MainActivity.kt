@@ -18,9 +18,8 @@ class MainActivity : ComponentActivity() {
         val db = Room.databaseBuilder(this, ProductDatabase::class.java, "product_database")
             .fallbackToDestructiveMigration().allowMainThreadQueries().build()
         val dao = db.productDao
-        val instancia = ProductService.instance
-        val repository = ProductRepository(dao,instancia)
-        val viewmodel = ViewModel(repository,instancia)
+        val repository = ProductRepository(dao)
+        val viewmodel = ViewModel(repository)
         enableEdgeToEdge()
         setContent {
             GDTControlTheme {

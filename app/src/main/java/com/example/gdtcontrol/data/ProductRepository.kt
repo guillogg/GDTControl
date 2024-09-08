@@ -1,13 +1,11 @@
 package com.example.gdtcontrol.data
 
 import com.example.gdtcontrol.Product
-import com.example.gdtcontrol.ProductService
 
 
 class ProductRepository(
-    private val productDao: ProductDao,
-    private val productService: ProductService
-    ) {
+    private val productDao: ProductDao
+) {
 
 
     fun getProductById(id: Int): Product? {
@@ -36,13 +34,7 @@ class ProductRepository(
             proveedor = product.proveedor,
             emailProveedor = product.emailProveedor
         )
-        productService.createProduct(entity)
-        try {
-            productDao.addProduct(entity)
-        }catch (e: Exception){
-            //
-        }
-
+        productDao.addProduct(entity)
 
 
     }

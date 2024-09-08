@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ViewModel(private val productRepository: ProductRepository,private val productService: ProductService) : ViewModel() {
+class ViewModel(private val productRepository: ProductRepository) : ViewModel() {
     var state by mutableStateOf(ProductGeneratorState())
         private set
 
@@ -158,7 +158,7 @@ class ViewModel(private val productRepository: ProductRepository,private val pro
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     mailSender.sendEmail(
-                        "guillermo_gaona@hotmail.com",
+                        product.value!!.emailProveedor,
                         "Stock Bajo del producto ${product.value?.name}",
                         "El stock del producto ${product.value?.name} es bajo, necesitamos que nos envies ${product.value!!.stockMax - product.value!!.stockMin} mas"
                     )
@@ -177,4 +177,3 @@ class ViewModel(private val productRepository: ProductRepository,private val pro
 
 
 }
-

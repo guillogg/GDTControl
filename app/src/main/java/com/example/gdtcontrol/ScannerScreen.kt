@@ -102,7 +102,7 @@ fun ScannerScreen(viewModel: ViewModel, navController: NavHostController) {
                     .weight(1f)
             )
         }
-
+        code="36"
         Spacer(modifier = Modifier.weight(1f))
 
 

@@ -2,6 +2,7 @@ package com.example.gdtcontrol
 
 
 data class Product(
+
     val name:String,
     val description:String,
     val stock:Int,

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "108255216035",
+    "project_id": "gdtcontrol",
+    "storage_bucket": "gdtcontrol.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:108255216035:android:7dbd4a0a72cc3960275a16",
+        "android_client_info": {
+          "package_name": "com.example.gdtcontrol"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkmssJpIcL9A4ukPlo8zUjnvmrvTL7IJQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
